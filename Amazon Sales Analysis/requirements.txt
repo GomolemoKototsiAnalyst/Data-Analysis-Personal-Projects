@@ -4,3 +4,4 @@ numpy
 streamlit
 matplotlib.pyplot
 requests
+StringIO
