@@ -5,3 +5,6 @@ streamlit
 matplotlib.pyplot
 requests
 StringIO
+streamlit_option_menu
+strings
+datetime
