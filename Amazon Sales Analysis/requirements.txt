@@ -8,3 +8,4 @@ StringIO
 streamlit_option_menu
 strings
 datetime
+plotly.express
