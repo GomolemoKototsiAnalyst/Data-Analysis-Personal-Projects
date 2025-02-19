@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import requests
@@ -10,6 +9,7 @@ from streamlit_option_menu import option_menu
 import warnings 
 from datetime import datetime, timedelta
 import plotly.express as px
+import base64
 
 #import streamlit as st
 st.set_page_config(
@@ -131,17 +131,22 @@ color_theme_list = {
 with st.sidebar:
     #bst.markdown("<h3 style='text-align: left;'>SLA FILTERI</h3>", unsafe_allow_html=True)
     # Specify the relative path to the image
-    image_sidebar= os.path.join("Images", "amazon-logo-1024x683.png-1.jpg")  
+    #image_sidebar= os.path.join("Images", "amazon-logo-1024x683.png-1.jpg")  
 
     # Replace with your image name
     #base64_image = get_base64_image(image_path)
-    st.image(image_sidebar)
+    #st.image(image_sidebar)
     
     # Initial selection summary:
     if st.checkbox("Annual Report", value=True):
         selected_month = sorted(df["Month"].unique())
     else:
         selected_month = st.sidebar.multiselect("Select Month",sorted((df["Month"]).unique()),default=sorted(df["Month"].unique()))
+    
+    if st.checkbox("Overall Sales by State", value=True):
+        selected_status = sorted(df["Status"].astype('str').unique())
+    else:
+        selected_status = st.multiselect("Select Product Phase",sorted((df["Status"].astype('str')).unique()), default=sorted(df["Status"].astype('str').unique()))
         
         # Initial selection summary:
     if st.checkbox("eCommerce Site:", value=True):
@@ -172,7 +177,7 @@ Product_groups = Sales_df.groupby(['Category','Fulfilment', 'Status'])['Amount']
 
 total_Product = Product_groups.groupby('Category')['Amount'].sum().reset_index()
 
-filtered_category_totals_new = filtering_df.groupby(['Status','Category','Fulfilment'])['Amount'].sum().reset_index()
+filtered_category_totals_new = filtering_df.groupby(['Status','Category'])['Amount'].sum().reset_index()
 
 # Step 1: Rename all occurrences of 'A' in the 'Category' column to 'Alpha':
 total_state_sales = ['Delivered','In Transit-  Courier','In Transit - Customer','Packing Order','Waiting Pick Up','Delivered Waiting Collection']
@@ -180,24 +185,32 @@ total_state_sales = ['Delivered','In Transit-  Courier','In Transit - Customer',
 filtered_category_totals_new.loc[filtered_category_totals_new['Status'].isin(total_state_sales), 'Status'] = 'Delivered'
 
 # Step 2: Group by the 'Category' column and sum the 'Count'
-filtered_category_totals = filtered_category_totals_new.groupby(['Status','Category'], as_index=False).agg({'sum'})
+filtered_category_totals = filtered_category_totals_new.groupby(['Status','Category'], as_index=False).agg({'Amount':'sum'})
 """
 
 """
 
-name_category_totals = Sales_df.groupby(['Category', 'Fulfilment','Status'])['Amount'].sum().reset_index()
+name_category_totals = filtering_df.groupby(['Category', 'Fulfilment','Status'])['Amount'].sum().reset_index()
 
-category_totals = Sales_df.groupby(['Category', 'Fulfilment'])['Amount'].sum().reset_index()
+category_totals = filtering_df.groupby(['Category', 'Fulfilment'])['Amount'].sum().reset_index()
+
+sub_categories  = name_category_totals.groupby('Category', as_index=False)['Amount'].sum()
+
+#sub_categories['u_service_offering_subcategory'] = name_category_totals['u_service_offering_subcategory'].replace(renaming_mapping)
+
+#sub_categories_df =  sub_categories.groupby('Category', as_index=False)['Amount'].sum()
+
+sub_categories_sorted = sub_categories.sort_values(by="Amount", ascending=False)
 
 def ensure_all_states(df, required_states=None):
     if required_states is None:
-        required_states = ['In Progress', 'New', 'On Hold', 'Canceled', 'Resolved']
+        required_states = ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller']
     
     # Check for missing states
-    missing_states = [state for state in required_states if state not in df['state'].values]
+    missing_states = [state for state in required_states if state not in df['Status'].values]
     
     # Create a DataFrame for missing states with count 0
-    missing_states_df = pd.DataFrame({'state': missing_states, 'Count': [0] * len(missing_states)})
+    missing_states_df = pd.DataFrame({'Status': missing_states, 'Amount': [0] * len(missing_states)})
     
     # Concatenate the original DataFrame with the missing states DataFrame
     df = pd.concat([df, missing_states_df], ignore_index=True)
@@ -228,7 +241,7 @@ def calculate_max_user(users_totals):
             print("The DataFrame is empty.")
             return {"max_user": 0, "max_incident_count": 0, "percentage": 0}
 
-        # Group by 'assigned_to' and sum 'Count'
+        # Group by 'Fulfilment' and sum 'Count'
         total_person = name_category_totals.groupby('Fulfilment')['Amount'].sum().reset_index()
 
         # Check if total_person is empty
@@ -255,9 +268,9 @@ def calculate_max_user(users_totals):
                         max_state_sum = state_sums_sorted.iloc[0]
                         max_user = state_sums_sorted.index[0]
             if max_user is None:
-                max_user = max_users.iloc[0]['assigned_to']
+                max_user = max_users.iloc[0]['Fulfilment']
         else:
-            max_user = max_users.iloc[0]['assigned_to']
+            max_user = max_users.iloc[0]['Fulfilment']
            
         if max_user == 0 or not max_user:
             print("No user with incidents to report.")
@@ -275,118 +288,56 @@ def calculate_max_user(users_totals):
 
 max_user,max_incident_count,percentage = calculate_max_user(name_category_totals)
 
-# Specify the relative path to the SVG icon
-svg_icon_path = os.path.join("Images", "shirt-solid.svg")
-#local_icon_url = os.path.join("Images", "account_circle_78dp_3E6184_FILL0_wght400_GRAD0_opsz48.svg")
-#local_icon_url1 = os.path.join("Images","warning.svg")
-groups_loc = os.path.join("Images","shop-solid.svg")
 
+groups_loc = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shop-solid.svg"
+response =  requests.get(groups_loc)
+groups_icon = response.text
 
-if os.path.exists(groups_loc):
-    with open(groups_loc, "r") as file:
-        groups_icon = file.read()
-else:
-    None
-
-
-svg_icon_path = os.path.join("Images","shirt-solid.svg")
-# Ensure the file exists and read its contents
-if os.path.exists(svg_icon_path):
-    with open(svg_icon_path, "r") as file:
-        svg_icon = file.read()
-else:
-    st.error(f"File not found: {svg_icon_path}")
-    
-    
-svg_progress_path = os.path.join("Images","trash-solid.svg")
-# Ensure the file exists and read its contents
-if os.path.exists(svg_progress_path):
-    with open(svg_progress_path, "r") as file:
-        svg_progress = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_progress_path}")
-    
-# Getting a icon using CSS stle: - Highest
-#svg_new_path= os.path.join("Images", "ban-solid (1).svg")
-# Ensure the file exists and read its contents
-#if os.path.exists(svg_new_path):
-    #with open(svg_new_path, "r") as file:
-        #svg_new = file.read()
-#else:
-    #None
-    #st.error(f"File not found: {svg_new_path}")
+# Construct the path to the SVG file
+svg_icon_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shirt-solid.svg"
+response = requests.get(svg_icon_path)
+svg_icon = response.text
+ 
+# Construct the path to the SVG file
+svg_progress_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/trash-solid.svg"
+response = requests.get(svg_progress_path)
+svg_progress = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_new_path= os.path.join("Images", "route-solid.svg")
-# Ensure the file exists and read its contents
-if os.path.exists(svg_new_path):
-    with open(svg_new_path, "r") as file:
-        svg_new = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_new_path}")
+svg_new_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/route-solid.svg"
+response = requests.get(svg_new_path)
+svg_new = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_seller_path= os.path.join("Images", "right-left-solid.svg")
-# Ensure the file exists and read its contents
-if os.path.exists(svg_seller_path):
-    with open(svg_seller_path, "r") as file:
-        svg_seller = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_new_path}")
+svg_seller_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/right-left-solid.svg"
+response = requests.get(svg_seller_path)
+svg_seller = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_return_path= os.path.join("Images", "truck-solid.svg")
-# Ensure the file exists and read its contents
-if os.path.exists(svg_return_path):
-    with open(svg_return_path, "r") as file:
-        svg_return = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_new_path}")
-
+svg_return_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/truck-solid.svg"
+response = requests.get(svg_return_path)
+svg_return = response.text
 
 # Getting a icon using CSS style: - Highest:
-svg_resolved_path= os.path.join("Images","money-rupee-circle-line.svg")
-if os.path.exists(svg_resolved_path):
-    with open(svg_resolved_path, "r") as file:
-        svg_resolved = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_resolved_path}")
-
-    
+svg_resolved_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/money-rupee-circle-line.svg"
+response = requests.get(svg_resolved_path)
+svg_resolved = response.text
+  
 # Getting a icon using CSS style: - Highest : Fulfilment Stuff.
-svg_total_path = os.path.join("Images", "shop-solid.svg")
-#svg_total = encode_image(svg_total_path)
-if os.path.exists(svg_total_path):
-    with open(svg_total_path, "r") as file:
-        svg_total = file.read()
-else:
-    None
+svg_total_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shop-solid.svg"
+reponse = requests.get(svg_total_path)
+svg_total = reponse.text
 
 # Getting a icon using CSS style: - Highest 
-svg_icon_path_1= os.path.join("Images", "file-excel-solid.svg")
-#svg_hold = encode_image(svg_icon_path)
-if os.path.exists(svg_icon_path_1):
-    with open(svg_icon_path_1, "r") as file:
-        svg_hold = file.read()
-else:
-    None
-    #st.error(f"File not found: {svg_icon_path}")
+svg_icon_path_1= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/file-excel-solid.svg"
+response = requests.get(svg_icon_path_1)
+svg_hold = response.text
 
 
-svg_cancelled_path = os.path.join("Images","ban-solid (1).svg")
-#svg_cancelled = encode_image(svg_cancelled_path)
-if os.path.exists(svg_cancelled_path):
-    with open(svg_icon_path, "r") as file:
-        svg_cancelled = file.read()
+svg_cancelled_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/ban-solid (1).svg"
+response = requests.get(svg_cancelled_path)
+svg_cancelled = response.text
 
-else:
-    None
-    #st.error(f"File not found: {svg_cancelled_path}")
 
 def get_max_group(Product_groups, selected_states):
         # Check if DataFrame is empty
@@ -437,7 +388,7 @@ def get_max_group(Product_groups, selected_states):
 group_with_max_incidents, group_max_incident_count, percentage_group = get_max_group(Product_groups, ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller'])
 
 # Creating a function to get totals:
-def total_counts(df, state_list= selected_status):
+def total_counts(df,state_list=selected_status):
     if state_list is None:
         # Default list of states to include in the total count
         state_list = ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller']
@@ -448,9 +399,9 @@ def total_counts(df, state_list= selected_status):
     # Loop over each state in the state_list
     for state in state_list:
         # Check if the state exists in the DataFrame
-        if state in df['state'].values:
+        if state in df['Status'].values:
             # Add the count for the existing state
-            total_counts += df.loc[df['state'] == state, 'Amount'].values[0]
+            total_counts += df.loc[df['Status'] == state, 'Amount'].values[0]
         else:
             # If the state is missing, assume its count is zero
             total_counts += 0
@@ -461,11 +412,11 @@ def get_state_counts(df, selected_states):
     state_counts = {state: {'count': 0, 'percentage': 0.0} for state in selected_states}
     
     # Calculate the total count for all selected states
-    total_count = df[df['state'].isin(selected_states)]['Amount'].sum()
+    total_count = df[df['Status'].isin(selected_states)]['Amount'].sum()
     
     # Calculate counts for each selected state
     for state in selected_states:
-        count = int(df.loc[df['state'] == state, 'Amount'].sum())  # Use sum() to handle multiple entries
+        count = df.loc[df['Status'] == state, 'Amount'].sum()  # Use sum() to handle multiple entries
         state_counts[state]['count'] = count
     
     # Calculate the percentage for each state
@@ -478,16 +429,16 @@ def get_state_counts(df, selected_states):
     
     return state_counts
 
-state_list = ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller']
+#state_list = ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller']
 
 # Assuming filtered_category_totals is your DataFrame and selected_status is your list of states
-state_counts = get_state_counts(filtered_category_totals, state_list)
+state_counts = get_state_counts(filtered_category_totals, selected_status)
 
  # Safely access the counts and percentages for each selected state
 totals = {state: {
     'total': state_counts.get(state, {}).get('Amount', 0),
     'percentage': state_counts.get(state, {}).get('percentage', 0.0)
-} for state in state_list}
+} for state in selected_status}
 
 # Example of accessing specific totals
 total_in_progress = int(totals.get('Damaged', {}).get('total', 0))
@@ -514,7 +465,7 @@ percentage_on_seller = f"{float(totals.get('In Transit - Seller', {}).get('perce
 
 # The total loss of Sales/Deferred Sales for all selected states
 total_count_overall= int(state_counts.get('Deferred Sales', 0))
-percentage_total = f"{sum(totals[state]['percentage'] for state in state_list)}%"
+percentage_total = f"{sum(totals[state]['percentage'] for state in selected_status)}%"
 
 
 
@@ -663,7 +614,7 @@ with  col[0]:
         delta_person = f'% Contribution YTD:{str(percentage)}%'
         
         #group_with_max_incidents, group_max_incident_count, percentage_group = get_max_group(Product_groups, selected_status)
-        icon = svg_icon.replace('<svg', '<svg style="width: 40px; height: 40px;"')
+        #icon = svg_icon.replace('<svg', '<svg style="width: 40px; height: 40px;"')
         def metric_with_icon(label, value, delta, svg_icon):
             #Resize the SVG icon
             resized_icon = svg_icon.replace('<svg', '<svg style="width: 40px; height: 40px;"')
@@ -694,7 +645,7 @@ with  col[0]:
         return_id = 'Returned-Seller'
         seller_id = 'In Transit - Seller'
         Workload_id = f'Deferred Sales'
-
+        #svg_progress = encode_image(svg_progress_path)
         # Display Incident Summary Indicator: 
         metric_with_icon(Progress_id, total_in_progress, percentage_in_progress, svg_progress)
         metric_with_icon(Resolved_id, total_resolved , percentage_resolved, svg_resolved)
@@ -703,11 +654,9 @@ with  col[0]:
         metric_with_icon(return_id, total_on_returned,percentage_on_returned, svg_return)
         metric_with_icon(seller_id,total_on_seller,percentage_on_seller,svg_seller)
         metric_with_icon(Cancelled_id, total_cancelled ,percentage_cancelled, svg_cancelled)
-        metric_with_icon(Workload_id, total_count_overall,percentage_total, svg_deffered)
-        
+        metric_with_icon(Workload_id, total_count_overall,percentage_total, svg_total)
         #Displing the user:  Which Business drove the most Sales in 2020 was it Amazon Inhouse or Externam Merchants:           
         metric_with_icon(title_person, value_person ,delta_person, svg_icon)
-        #Displaying Max group:
         metric_with_icon(title_group, value_group ,delta_group, groups_icon)
 
 
@@ -717,7 +666,7 @@ with col[1]:
     # Function to create a progress bar in HTML
     def get_progress_bar_html(value, max_value=None, color='#3e6184'):
         if max_value is None:
-            max_value = max(sub_categories_sorted['Count'])  # Use max incidents from the dataset if not provided
+            max_value = max(sub_categories_sorted['Amount'])  # Use max incidents from the dataset if not provided
             percentage = (value / max_value) * 100
             return f"""
             <div style="background-color: #f3f3f3; border-radius: 5px; width: 100%; height: 20px; margin: 5px 0;">
@@ -728,11 +677,11 @@ with col[1]:
     # Function to create HTML representation of the DataFrame
     def create_html_table(df):
         html = '<table style="width: 100%; border-collapse: collapse;">'
-        html += '<thead><tr><th style="padding: 8px; text-align: left;">Service Offering Subcategory</th><th style="padding: 8px; text-align: left;">Count</th></tr></thead>'
+        html += '<thead><tr><th style="padding: 8px; text-align: left;">Service Offering Subcategory</th><th style="padding: 8px; text-align: left;">Amount</th></tr></thead>'
         html += '<tbody>'
         for _, row in df.iterrows():
-            html += f'<tr><td style="padding: 8px; border: 1px solid #ddd;">{row["u_service_offering_subcategory"]}</td>'
-            html += f'<td style="padding: 8px; border: 1px solid #ddd;">{get_progress_bar_html(row["Count"])}</td></tr>'
+            html += f'<tr><td style="padding: 8px; border: 1px solid #ddd;">{row["Category"]}</td>'
+            html += f'<td style="padding: 8px; border: 1px solid #ddd;">{get_progress_bar_html(row["Amount"])}</td></tr>'
         html += '</tbody></table>'
         return html
         
