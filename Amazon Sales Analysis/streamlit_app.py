@@ -55,8 +55,9 @@ df['Amount'] = df['Amount'].fillna(0)
 df['Amount'] = df['Amount']*0.01150
 
 # Function to format as currency:
-#def format_currency(value):
-    #return "${:,.2f}".format(value)
+def format_currency(value):
+    value = float(value)
+    return "${:,.2f}".format(value)
 
 #df['Amount'] = df['Amount'].apply(format_currency)
 
@@ -83,7 +84,7 @@ df['Month'] = pd.Categorical(df['Month'], categories=list(month_order.values()),
 # Sort the DataFrame by Year and Month_Name
 df = df.sort_values(by=['Year', 'Month'])
 
-print(df['ship-city'].unique())
+print(df['ship-state'].unique())
 
 
 # Rename - Configuration of the Status": 
@@ -133,7 +134,7 @@ with st.sidebar:
 
     # Replace with your image name
     #base64_image = get_base64_image(groups_icon)
-    #st.image(image_sidebar)
+    st.image(image_sidebar)
     
     # Initial selection summary:
     if st.checkbox("Annual Report", value=True):
@@ -411,7 +412,7 @@ def get_state_counts(df, selected_states):
     
     # Calculate counts for each selected state
     for state in selected_states:
-        count = df.loc[df['Status'] == state, 'Amount'].sum()  # Use sum() to handle multiple entries
+        count = int(df.loc[df['Status'] == state, 'Amount'].sum()) # Use sum() to handle multiple entries
         state_counts[state]['count'] = count
     
     # Calculate the percentage for each state
@@ -431,7 +432,7 @@ state_counts = get_state_counts(filtered_category_totals, selected_status)
 
  # Safely access the counts and percentages for each selected state
 totals = {state: {
-    'total': state_counts.get(state, {}).get('Amount', 0),
+    'total': state_counts.get(state, {}).get('count', 0),
     'percentage': state_counts.get(state, {}).get('percentage', 0.0)
 } for state in selected_status}
 
@@ -459,8 +460,8 @@ total_on_seller = int(totals.get('In Transit - Seller', {}).get('total', 0))
 percentage_on_seller = f"{float(totals.get('In Transit - Seller', {}).get('percentage', 0.0))}%"
 
 # The total loss of Sales/Deferred Sales for all selected states
-total_count_overall= int(state_counts.get('Deferred Sales', 0))
-percentage_total = f"{sum(totals[state]['percentage'] for state in selected_status)}%"
+#total_count_overall= int(state_counts.get('Deferred Sales', 0))
+#percentage_total = f"{sum(totals[state]['percentage'] for state in selected_status)}%"
 
 
 
@@ -474,7 +475,7 @@ def create_choropleth(states_log, counties, selected_color_theme):
     if states_log.empty or states_log['Amount'].sum() == 0:
         # Placeholder DataFrame: Display all states with zero incidents
         states_log = pd.DataFrame({
-            'ship-state':[feature['properties']['NAME_1'] for feature in counties['features']],  # Use all states in the geojson
+            'ship-state': [feature['properties']['NAME_1'] for feature in counties['features']],  # Use all states in the geojson
             'Amount': [0] * len(counties['features'])
         })
 
@@ -491,13 +492,13 @@ def create_choropleth(states_log, counties, selected_color_theme):
             states_log,
             geojson=counties,
             locations='ship-state',
-            featureidkey="properties.name",
+            featureidkey="properties.NAME_1",
             color_discrete_sequence=['lightgrey'],  # Default color when no incidents
             mapbox_style="carto-positron",
             zoom=3.5,
             center={"lat": 20.5937, "lon": 78.9629},
             opacity=0.5,
-            labels={'Amount': 'Total Sales'}
+            labels={'Amount': 'Total Sales (in dollars)'}
         )
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         return fig
@@ -507,7 +508,7 @@ def create_choropleth(states_log, counties, selected_color_theme):
         states_log,
         geojson=counties,
         locations='ship-state',
-        featureidkey="properties.name",
+        featureidkey="properties.NAME_1",
         color='Amount',
         color_continuous_scale=color_theme_list[selected_color_theme],
         range_color=range_color,
@@ -515,14 +516,15 @@ def create_choropleth(states_log, counties, selected_color_theme):
         zoom=3.5,
         center={"lat": 20.5937, "lon": 78.9629},  # Center on India
         opacity=0.5,
-        labels={'Amount': 'Total Sales'}
+        labels={'Amount': 'Total Sales (in dollars)'}
     )
-    fig.update_geos(scope="asia")
+    #fig.update_geos(scope="asia")
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
     return fig
 
 choropleth = create_choropleth(states_log, counties, selected_color_theme)
+
 ## Main Page for the Board: 
 col = st.columns((2,4,2), vertical_alignment="top")
 colors = ['#3e6184','#2e4459' ,'#5d88b3', '#92afcc', '#d5e0ec']
@@ -637,37 +639,65 @@ with  col[0]:
         Workload_id = f'Deferred Sales'
         #svg_progress = encode_image(svg_progress_path)
         # Display Incident Summary Indicator: 
-        metric_with_icon(Progress_id, total_in_progress, percentage_in_progress, svg_progress)
-        metric_with_icon(Resolved_id, total_resolved , percentage_resolved, svg_resolved)
-        metric_with_icon(Hold_id, total_on_hold ,percentage_on_hold, svg_hold)
-        metric_with_icon(New_id,total_new ,percentage_new, svg_new)
-        metric_with_icon(return_id, total_on_returned,percentage_on_returned, svg_return)
-        metric_with_icon(seller_id,total_on_seller,percentage_on_seller,svg_seller)
+        #metric_with_icon(Progress_id, total_in_progress, percentage_in_progress, svg_progress)
+        metric_with_icon(Resolved_id, f'{format_currency(total_resolved)}', percentage_resolved, svg_resolved)
+        #metric_with_icon(Hold_id, total_on_hold ,percentage_on_hold, svg_hold)
+        metric_with_icon(New_id,f'{format_currency(total_new)}' ,percentage_new, svg_new)
+        metric_with_icon(return_id, f'{format_currency(total_on_returned)}',percentage_on_returned, svg_return)
+        metric_with_icon(seller_id,f'{format_currency(total_on_seller)}',percentage_on_seller,svg_seller)
         #metric_with_icon(Cancelled_id, total_cancelled ,percentage_cancelled, svg_cancelled)
         #metric_with_icon(Workload_id, total_count_overall,percentage_total, svg_total)
 
         #Displing the user:  Which Business drove the most Sales in 2020 was it Amazon Inhouse or Externam Merchants:           
-        metric_with_icon(title_person, value_person ,delta_person,groups_icon)
-        metric_with_icon(title_group, value_group ,delta_group, svg_icon)
+        metric_with_icon(title_person, f'{format_currency(value_person)}' ,delta_person,groups_icon)
+        metric_with_icon(title_group, f'{format_currency(value_group)}',delta_group, svg_icon)
 
 
 with col[1]:
     st.write("#### Amazon Sales Footprint by Indian States:")
     st.plotly_chart(choropleth, use_container_width=True)
     #st.write("#### Top Service Requests:")
+    set_color_map = [
+         '#5d88b3',  '#92afcc' ,'#5d88b3', '#2e4459','#6d93ba','#becfe0','#495766', '#1d2328','#8c96a0','#d8e3ec',
+         '#005172','#003044', '#001822', '#4c859c', '#99b9c6','#4c859c' , '#99b2bc','#668b9a','#002748', '#193c5a', 
+         '#32526c', '#4c677e', '#667d91', '#7f93a3','#99a8b5', '#b2bec8', '#2d2a27', '#5a544e','#cac5c1','#f4f3f2',
+         '#005475', '#008cc4', '#006289', '#005475', '#5d88b3','#537AA1','#4A6C8F','#415F7D','#7D9FC2','#8DABC9',
+         '#9DB7D1','#ADC3D8','#BECFE0', '#37516B','#2E4459','#253647','#1B2835', '#6C7C8A', '#818E9B','#96A1AB',
+         '#ABB4BC'
+    ]
+    
+    # Ensure the number of colors matches the unique values in `ship-state`
+    unique_states = states_log['ship-state'].unique()
+    color_map_dict = {state: set_color_map[i % len(set_color_map)] for i, state in enumerate(unique_states)}
+
+    color_map = list(set_color_map)
+    fig = px.bar(
+        states_log,
+        x='ship-state',
+        y='Amount',
+        color='ship-state',
+        color_discrete_map= color_map_dict,
+        barmode='group',
+        title='Total Sales by Indian State in Rupees',
+        labels={'Amount': 'Total Sales', 'Ship State': 'State'}
+    )
+    #fig.update_layout(width=500,height=550)
+    st.plotly_chart(fig, use_container_width=True)
 
 with col[2]:
     # Function to create a progress bar in HTML
     def get_progress_bar_html(value, max_value=None, color='#3e6184'):
         if max_value is None:
-            max_value = max(sub_categories_sorted['Amount'])  # Use max incidents from the dataset if not provided
-            percentage = (value / max_value) * 100
-            return f"""
-            <div style="background-color: #f3f3f3; border-radius: 5px; width: 100%; height: 20px; margin: 5px 0;">
+            max_value = max(sub_categories_sorted['Amount'])
+        percentage = (value / max_value) * 100
+        formatted_value = format_currency(value) 
+        return f"""
+        <div style="background-color: #f3f3f3; border-radius: 5px; width: 100%; height: 20px; margin: 5px 0;">
                 <div style="background-color: {color}; width: {percentage}%; height: 100%; border-radius: 5px;"></div>
-            </div>
-            <div style="text-align: right; font-weight: bold;">{value}</div>  <!-- Display the count value -->
-            """
+        </div>
+        <div style="text-align: right; font-weight: bold;">{formatted_value}</div>  <!-- Display the count value -->
+        """
+    
     # Function to create HTML representation of the DataFrame
     def create_html_table(df):
         html = '<table style="width: 100%; border-collapse: collapse;">'
@@ -704,6 +734,6 @@ with col[2]:
     with st.expander("Dashboard Overview: ", expanded=True):
         st.write('''
             - **Data Source**: Kaggle Hub: Amazon India's Sales Report for the period March, April, May, & June 2022.
-            - Summary: Most Commercial Sales were made from Amazon retail stores and not external merchants. Accounting for 69 percent overall sales for the period (in dollars). 
+            - **Summary**: Most Commercial Sales were made from Amazon retail stores and not external merchants. Accounting for 69 percent overall sales for the period (in dollars). 
             - Overall most sold product in the period were T-Shirts and their most profitable state is 
             ''')
