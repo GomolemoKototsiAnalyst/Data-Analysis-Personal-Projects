@@ -6,7 +6,7 @@ The business stakeholders are seeking to evaluate the commercial performance of 
 
 # Data Source: 
 
-[![Kaggle](https://www.vectorlogo.zone/logos/kaggle/kaggle-ar21.svg)](https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned)
+Amazon Sales Report data spanning the duration of 2022 for the month March, April, May and June. It was obtained from the [![Kaggle](https://www.vectorlogo.zone/logos/kaggle/kaggle-ar21.svg)](https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned)
 
 ### Programming Software used: 
 [![Python](https://www.python.org/static/community_logos/python-logo-generic.svg)](https://www.python.org/about/)
@@ -25,8 +25,8 @@ Libraries:
 
 
 ###UI: User Interface Tuning:
-CSS Styling & HTML 
-[![CSS Styling](https://en.m.wikipedia.org/wiki/File:HTML5_logo_and_wordmark.svg)](https://www.w3schools.com/html/html_css.asp)
+
+CSS Styling & HTML [![CSS Styling](https://www.vectorlogo.zone/logos/w3_html5/w3_html5-ar21.svg)](https://www.w3schools.com/html/html_css.asp)
 
 # Dynamic Dashboard Reporting: 
 
