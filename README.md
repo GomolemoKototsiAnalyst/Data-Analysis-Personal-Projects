@@ -14,10 +14,15 @@ The business stakeholders are seeking to evaluate the commercial performance of 
 #### Prerequisite libraries: 
 Libraries: 
 Pandas
+\\
 Numpy
+\\
 Requests
+\\
 String
+\\
 StringIO
+
 Streamlit
 Streamlit_option_menu
 Plotly.Express
