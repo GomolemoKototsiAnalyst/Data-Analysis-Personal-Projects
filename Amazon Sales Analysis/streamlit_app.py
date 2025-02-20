@@ -19,14 +19,6 @@ st.set_page_config(
 )
 
 #ETL Process Stage: 
-"""
-- Import the Dataset from Kaggle Hub:
-- Create additional Date Columns
-- Transform configuration of Status
-- 
-
-"""
-
 # Function to import the CSV data: 
 def read_csv_from_url(url: str, encoding='ISO-8859-1') -> pd.DataFrame:
     try:
@@ -52,19 +44,21 @@ def read_csv_from_url(url: str, encoding='ISO-8859-1') -> pd.DataFrame:
 path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/refs/heads/main/Amazon%20Sales%20Analysis/Amazon%20Sale%20Report.csv"
 df  = read_csv_from_url(path, encoding='ISO-8859-1')
 
-# Adding Columns: 
-"""
- - Convert the all dates to the same format
- - Structure the date column into the correct year and month
- - Mapping the digits month to appear as Jan, Feb - Mar
-
-"""
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
 df['Year'] = df['Date'].dt.year
 
 df['Month']=  df['Date'].dt.month
 
+df['Amount'] = df['Amount'].fillna(0)
+
+df['Amount'] = df['Amount']*0.01150
+
+# Function to format as currency:
+#def format_currency(value):
+    #return "${:,.2f}".format(value)
+
+#df['Amount'] = df['Amount'].apply(format_currency)
 
 # Mapping the Month Column: 
 month_order = {1:'January', 
@@ -89,7 +83,7 @@ df['Month'] = pd.Categorical(df['Month'], categories=list(month_order.values()),
 # Sort the DataFrame by Year and Month_Name
 df = df.sort_values(by=['Year', 'Month'])
 
-#print(df['Status'].unique())
+print(df['ship-city'].unique())
 
 
 # Rename - Configuration of the Status": 
@@ -118,7 +112,7 @@ df['Sales Channel'] = df['Sales Channel'].replace({
 
 
 # Creating a default Color Theme:
-
+print(df['ship-city'].unique())
 # Define the color schemes:
 color_theme_list = {
     'One': ['#5d88b3', '#2e4459','#6d93ba','#becfe0','#495766', '#1d2328','#8c96a0','#d8e3ec'],
@@ -126,15 +120,19 @@ color_theme_list = {
     'Three': ['#002748', '#193c5a', '#32526c', '#4c677e', '#667d91', '#7f93a3','#99a8b5', '#b2bec8'],
     'Four': ['#2d2a27', '#5a544e','#cac5c1','#f4f3f2','#005475', '#008cc4', '#006289', '#005475']
 }
+base64_image = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/amazon-logo-1024x683.png-1.jpg"
+response =  requests.get(base64_image)
+image_sidebar = response.content
 
 # Creating a Sidebar:
 with st.sidebar:
     #bst.markdown("<h3 style='text-align: left;'>SLA FILTERI</h3>", unsafe_allow_html=True)
     # Specify the relative path to the image
+    
     #image_sidebar= os.path.join("Images", "amazon-logo-1024x683.png-1.jpg")  
 
     # Replace with your image name
-    #base64_image = get_base64_image(image_path)
+    #base64_image = get_base64_image(groups_icon)
     #st.image(image_sidebar)
     
     # Initial selection summary:
@@ -170,7 +168,7 @@ filter = ['Cancelled','Returned-Seller','Lost','Rejected','Damaged']
 Sales_df = filtering_df[~filtering_df['Status'].isin(filter)]
 
 # sales by states: 
-states_log= Sales_df.groupby(['ship-state'])['Amount'].sum().reset_index()
+states_log= filtering_df.groupby(['ship-state'])['Amount'].sum().reset_index()
 
 
 Product_groups = Sales_df.groupby(['Category','Fulfilment', 'Status'])['Amount'].sum().reset_index()
@@ -186,9 +184,6 @@ filtered_category_totals_new.loc[filtered_category_totals_new['Status'].isin(tot
 
 # Step 2: Group by the 'Category' column and sum the 'Count'
 filtered_category_totals = filtered_category_totals_new.groupby(['Status','Category'], as_index=False).agg({'Amount':'sum'})
-"""
-
-"""
 
 name_category_totals = filtering_df.groupby(['Category', 'Fulfilment','Status'])['Amount'].sum().reset_index()
 
@@ -246,7 +241,7 @@ def calculate_max_user(users_totals):
 
         # Check if total_person is empty
         if total_person.empty:
-            print("No incidents to report.")
+            print("No Products Sold to report.")
             return {"max_user": 0, "max_incident_count": 0, "percentage": 0}
 
         # Identify the user(s) with the maximum incident count
@@ -255,7 +250,7 @@ def calculate_max_user(users_totals):
         
         if len(max_users) > 1:
             state_priority = ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller']
-            state_sums = name_category_totals[name_category_totals['Status'].isin(state_priority)].groupby(['Fulfilment', 'Status'])['Count'].sum().unstack(fill_value=0)
+            state_sums = name_category_totals[name_category_totals['Status'].isin(state_priority)].groupby(['Fulfilment', 'Status'])['Amount'].sum().unstack(fill_value=0)
             
            
             max_user = None
@@ -385,7 +380,7 @@ def get_max_group(Product_groups, selected_states):
             percentage_group = 0
         return group_with_max_incidents, group_max_incident_count, percentage_group
         
-group_with_max_incidents, group_max_incident_count, percentage_group = get_max_group(Product_groups, ['Delivered','Lost','Cancelled','Rejected','Damaged','Returned-Seller','In Transit - Seller'])
+group_with_max_incidents, group_max_incident_count, percentage_group = get_max_group(Product_groups,selected_status)
 
 # Creating a function to get totals:
 def total_counts(df,state_list=selected_status):
@@ -470,28 +465,25 @@ percentage_total = f"{sum(totals[state]['percentage'] for state in selected_stat
 
 
 # Plotting a Choropleth
-url = 'https://raw.githubusercontent.com/Subhash9325/GeoJson-Data-of-Indian-States/refs/heads/master/Indian_States'
+url = 'https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson'
 response = requests.get(url)
 counties = response.json()
 
 def create_choropleth(states_log, counties, selected_color_theme):
-    # Check if there are no countries selected or all selected countries have zero incidents
+    # Check if there are no states selected or all selected states have zero incidents
     if states_log.empty or states_log['Amount'].sum() == 0:
-        # Placeholder DataFrame: Display all countries with zero incidents
+        # Placeholder DataFrame: Display all states with zero incidents
         states_log = pd.DataFrame({
-            'ship-state': [feature['properties']['name'] for feature in counties['features']],  # Use all countries in the geojson
-            'Amount':  [0] * len(counties['features'])
+            'ship-state': [feature['properties']['name'] for feature in counties['features']],  # Use all states in the geojson
+            'Amount': [0] * len(counties['features'])
         })
-        
+
     # Determine the max incidents for setting the color range
     max_incidents = states_log['Amount'].max()
-    
+
     # Avoid division by zero in color range calculation
     range_color = (0, max_incidents if max_incidents > 0 else 1)
 
-    # Use default color theme if selected_color_theme is not found
-    chart_colors = color_theme_list if not selected_color_theme else [color_theme_list['One'], color_theme_list['Two']]
-    
     # Check if all incident counts are zero
     if states_log['Amount'].sum() == 0:
         # Create a base map with no highlights
@@ -502,43 +494,41 @@ def create_choropleth(states_log, counties, selected_color_theme):
             featureidkey="properties.name",
             color_discrete_sequence=['lightgrey'],  # Default color when no incidents
             mapbox_style="carto-positron",
-            zoom=3,
-            center={"lat": 0, "lon": 20},
+            zoom=3.5,
+            center={"lat": 20.5937, "lon": 78.9629},  # Center on India
             opacity=0.5,
             labels={'Amount': 'Total Sales'}
         )
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         return fig
-                         
-    # Create the choropleth map with incident highlights:
-    max_incidents = states_log['Amount'].max()
+
+    # Create the choropleth map with incident highlights
     fig = px.choropleth_mapbox(
         states_log,
         geojson=counties,
         locations='ship-state',
         featureidkey="properties.name",
         color='Amount',
-        color_continuous_scale=color_theme_list[selected_color_theme][:len(states_log)],
-        range_color=(0, states_log['Amount'].max()),
+        color_continuous_scale=color_theme_list[selected_color_theme],
+        range_color=range_color,
         mapbox_style="carto-positron",
-        zoom=3,
-        center={"lat": 0, "lon": 20},
+        zoom=3.5,
+        center={"lat": 20.5937, "lon": 78.9629},  # Center on India
         opacity=0.5,
         labels={'Amount': 'Total Sales'}
     )
+    fig.update_geos(scope="asia")
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-    
+
     return fig
-    
+
 choropleth = create_choropleth(states_log, counties, selected_color_theme)
-
-
 ## Main Page for the Board: 
-col = st.columns((2,4), vertical_alignment="top")
+col = st.columns((2,4,2), vertical_alignment="top")
 colors = ['#3e6184','#2e4459' ,'#5d88b3', '#92afcc', '#d5e0ec']
 
 with  col[0]:
-    print('Gomolemo Testing Working')
+    #print('Gomolemo Testing Working')
     st.write("#### Amazon Sales Indicators:")
     # CSS styling my St.Metric: 
     pmg_him = f"""
@@ -653,16 +643,20 @@ with  col[0]:
         metric_with_icon(New_id,total_new ,percentage_new, svg_new)
         metric_with_icon(return_id, total_on_returned,percentage_on_returned, svg_return)
         metric_with_icon(seller_id,total_on_seller,percentage_on_seller,svg_seller)
-        metric_with_icon(Cancelled_id, total_cancelled ,percentage_cancelled, svg_cancelled)
-        metric_with_icon(Workload_id, total_count_overall,percentage_total, svg_total)
+        #metric_with_icon(Cancelled_id, total_cancelled ,percentage_cancelled, svg_cancelled)
+        #metric_with_icon(Workload_id, total_count_overall,percentage_total, svg_total)
+
         #Displing the user:  Which Business drove the most Sales in 2020 was it Amazon Inhouse or Externam Merchants:           
-        metric_with_icon(title_person, value_person ,delta_person, svg_icon)
-        metric_with_icon(title_group, value_group ,delta_group, groups_icon)
+        metric_with_icon(title_person, value_person ,delta_person,groups_icon)
+        metric_with_icon(title_group, value_group ,delta_group, svg_icon)
 
 
 with col[1]:
+    st.write("#### Amazon Sales Footprint by Indian States:")
     st.plotly_chart(choropleth, use_container_width=True)
-    st.write("#### Top Service Requests:")
+    #st.write("#### Top Service Requests:")
+
+with col[2]:
     # Function to create a progress bar in HTML
     def get_progress_bar_html(value, max_value=None, color='#3e6184'):
         if max_value is None:
@@ -677,7 +671,7 @@ with col[1]:
     # Function to create HTML representation of the DataFrame
     def create_html_table(df):
         html = '<table style="width: 100%; border-collapse: collapse;">'
-        html += '<thead><tr><th style="padding: 8px; text-align: left;">Service Offering Subcategory</th><th style="padding: 8px; text-align: left;">Amount</th></tr></thead>'
+        html += '<thead><tr><th style="padding: 8px; text-align: left;">Products</th><th style="padding: 8px; text-align: left;">Amount</th></tr></thead>'
         html += '<tbody>'
         for _, row in df.iterrows():
             html += f'<tr><td style="padding: 8px; border: 1px solid #ddd;">{row["Category"]}</td>'
@@ -709,7 +703,7 @@ with col[1]:
     # About the Board Type of Information: 
     with st.expander("Dashboard Overview: ", expanded=True):
         st.write('''
-            - **Data Source**: ServiceNow Logged Incidents for both BOS & Bridge Connect within the period of 2023, 2024 & 2025.
-            - IT Personnel Support Workload [**SLA Compliance Contribuion**]: Indicates contribution of IT agents contribution to the overall support of Bridge Connect & BOS System. 
-            - Southern & Eastern African Mapbox [**Regional Analyses**]: Illustrates the support provided by local IT team to the **Regional Offices** (in hundreds)
+            - **Data Source**: Kaggle Hub: Amazon India's Sales Report for the period March, April, May, & June 2022.
+            - Summary: Most Commercial Sales were made from Amazon retail stores and not external merchants. Accounting for 69 percent overall sales for the period (in dollars). 
+            - Overall most sold product in the period were T-Shirts and their most profitable state is 
             ''')
