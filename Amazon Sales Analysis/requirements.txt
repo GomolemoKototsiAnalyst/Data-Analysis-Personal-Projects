@@ -3,8 +3,8 @@ pandas
 numpy
 streamlit
 requests
-StringIO
 streamlit_option_menu
 strings
 datetime
 plotly
+os
