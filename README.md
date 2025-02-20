@@ -7,7 +7,7 @@ The business stakeholders are seeking to evaluate the commercial performance of 
 Data Source: 
 
 Kagge Dataset named: AmazonSalesReport
-[![Kaggle Hub Dataset](https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned)]
+[![Kaggle Hub Dataset](https://www.vectorlogo.zone/logos/kaggle/kaggle-ar21.svg)](https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned)
 
 ### Programming Software used: 
 
