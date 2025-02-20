@@ -12,21 +12,17 @@ The business stakeholders are seeking to evaluate the commercial performance of 
 [![Python](https://www.python.org/static/community_logos/python-logo-generic.svg)](https://www.python.org/about/)
 
 #### Prerequisite libraries: 
-Libraries: 
-Pandas
-\\
-Numpy
-\\
-Requests
-\\
-String
-\\
-StringIO
+Libraries:
+<ul>
+<li>Pandas</li>
+<li>Numpy</li>
+<li>Streamlit</li>
+<li>Streamlit_option_menu</li>
+<li>StringIO</li>
+<li>Plotly.Express</li>
+<li>Base64</li>
+</ul>
 
-Streamlit
-Streamlit_option_menu
-Plotly.Express
-Base64
 
 ###UI: User Interface Tuning:
 CSS Styling & HTML 
