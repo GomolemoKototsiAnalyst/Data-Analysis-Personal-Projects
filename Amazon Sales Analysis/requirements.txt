@@ -1,14 +1,6 @@
 streamlit
-pandas
 numpy
-streamlit
-requests
-streamlit_option_menu
-<<<<<<< HEAD
-plotly.express
-=======
-strings
-datetime
+pandas
+streamlit-option-menu
 plotly
-os
->>>>>>> fc4c013c5c071fe0fccb4805d02c4093d143caf7
+requests
