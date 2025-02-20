@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import plotly.express as px
 import base64
 
+
 #import streamlit as st
 st.set_page_config(
     layout="wide", 
@@ -671,6 +672,7 @@ with col[1]:
     color_map_dict = {state: set_color_map[i % len(set_color_map)] for i, state in enumerate(unique_states)}
 
     color_map = list(set_color_map)
+    states_log = states_log.sort_values(by='Amount', ascending=False)
     fig = px.bar(
         states_log,
         x='ship-state',
