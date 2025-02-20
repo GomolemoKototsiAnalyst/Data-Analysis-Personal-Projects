@@ -1,17 +1,17 @@
-Project Scenario: Commercial Outlook of Amazon Subsidiary in India (2022):
+# 🏂 Project Scenario: Commercial Outlook of Amazon Subsidiary in India (2022):
 
-Background:
+### Background:
 
 The business stakeholders are seeking to evaluate the commercial performance of Amazon's subsidiary in India for the year 2022. The goal is to gain actionable insights into the factors driving commercial value, identify profitable product categories, and optimize logistics to improve customer satisfaction and reduce operational costs.
 
 Data Source: 
 
 Kagge Dataset named: AmazonSalesReport
-https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned
+[![Kaggle Hub Dataset](https://www.kaggle.com/datasets/arpit2712/amazonsalesreport/discussion?sort=hotness&group=owned)]
 
-Programming Software used: 
+### Programming Software used: 
 
-Python: 
+#### Prerequisite libraries: 
 
 Libraries: 
 Pandas
@@ -24,13 +24,13 @@ Streamlit_option_menu
 Plotly.Express
 Base64
 
-UI: User Interface Tuning
+###UI: User Interface Tuning
 
 CSS Styling & HTML 
 
 Dynamic Dashboard Reporting: 
 
-Streamlit
+### Streamlit Dashboard 
 
 Hosting: Snowflake Cloud Service
 
