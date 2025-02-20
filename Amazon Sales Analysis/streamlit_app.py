@@ -474,7 +474,7 @@ def create_choropleth(states_log, counties, selected_color_theme):
     if states_log.empty or states_log['Amount'].sum() == 0:
         # Placeholder DataFrame: Display all states with zero incidents
         states_log = pd.DataFrame({
-            'ship-state': [feature['properties']['name'] for feature in counties['features']],  # Use all states in the geojson
+            'ship-state':[feature['properties']['NAME_1'] for feature in counties['features']],  # Use all states in the geojson
             'Amount': [0] * len(counties['features'])
         })
 
@@ -495,7 +495,7 @@ def create_choropleth(states_log, counties, selected_color_theme):
             color_discrete_sequence=['lightgrey'],  # Default color when no incidents
             mapbox_style="carto-positron",
             zoom=3.5,
-            center={"lat": 20.5937, "lon": 78.9629},  # Center on India
+            center={"lat": 20.5937, "lon": 78.9629},
             opacity=0.5,
             labels={'Amount': 'Total Sales'}
         )
