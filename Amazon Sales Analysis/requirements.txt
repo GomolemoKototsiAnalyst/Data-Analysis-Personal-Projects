@@ -2,7 +2,6 @@ streamlit
 pandas
 numpy
 streamlit
-matplotlib.pyplot
 requests
 StringIO
 streamlit_option_menu
