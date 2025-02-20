@@ -680,7 +680,7 @@ with col[1]:
         color='ship-state',
         color_discrete_map= color_map_dict,
         barmode='group',
-        title='Total Sales by Indian State in Rupees',
+        title='Total Sales by Indian State in Dollars',
         labels={'Amount': 'Total Sales', 'Ship State': 'State'}
     )
     #fig.update_layout(width=500,height=550)
