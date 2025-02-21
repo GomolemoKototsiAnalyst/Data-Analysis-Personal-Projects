@@ -718,7 +718,7 @@ with col[2]:
     st.markdown(
         """
         <style>
-        .scrollable-table {streamlit run 
+        .scrollable-table {
             max-height: 700px; /* Adjust height as needed */
             overflow-y: auto;
             overflow-x: hidden;
