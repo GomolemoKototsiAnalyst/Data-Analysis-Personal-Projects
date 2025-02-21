@@ -4,3 +4,4 @@ pandas
 streamlit-option-menu
 plotly
 requests
+base64
