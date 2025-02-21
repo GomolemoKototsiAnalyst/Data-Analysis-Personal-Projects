@@ -49,7 +49,7 @@ def read_csv_from_url(url: str, encoding='ISO-8859-1') -> pd.DataFrame:
 
 
 # Importing the Data: 
-path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/refs/heads/main/Amazon%20Sales%20Analysis/Amazon%20Sale%20Report.csv"
+path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/refs/heads/main/Amazon_Sales_Analysis/Amazon%20Sale%20Report.csv"
 df  = read_csv_from_url(path, encoding='ISO-8859-1')
 
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -129,7 +129,7 @@ color_theme_list = {
     'Three': ['#002748', '#193c5a', '#32526c', '#4c677e', '#667d91', '#7f93a3','#99a8b5', '#b2bec8'],
     'Four': ['#2d2a27', '#5a544e','#cac5c1','#f4f3f2','#005475', '#008cc4', '#006289', '#005475']
 }
-base64_image = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/amazon-logo-1024x683.png-1.jpg"
+base64_image = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/amazon-logo-1024x683.png-1.jpg"
 response =  requests.get(base64_image)
 image_sidebar = response.content
 
@@ -293,52 +293,52 @@ def calculate_max_user(users_totals):
 max_user,max_incident_count,percentage = calculate_max_user(name_category_totals)
 
 
-groups_loc = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shop-solid.svg"
+groups_loc = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/shop-solid.svg"
 response =  requests.get(groups_loc)
 groups_icon = response.text
 
 # Construct the path to the SVG file
-svg_icon_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shirt-solid.svg"
+svg_icon_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/shirt-solid.svg"
 response = requests.get(svg_icon_path)
 svg_icon = response.text
  
 # Construct the path to the SVG file
-svg_progress_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/trash-solid.svg"
+svg_progress_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/trash-solid.svg"
 response = requests.get(svg_progress_path)
 svg_progress = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_new_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/route-solid.svg"
+svg_new_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/route-solid.svg"
 response = requests.get(svg_new_path)
 svg_new = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_seller_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/right-left-solid.svg"
+svg_seller_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/right-left-solid.svg"
 response = requests.get(svg_seller_path)
 svg_seller = response.text
 
 # Getting a icon using CSS stle: - Highest
-svg_return_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/truck-solid.svg"
+svg_return_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/truck-solid.svg"
 response = requests.get(svg_return_path)
 svg_return = response.text
 
 # Getting a icon using CSS style: - Highest:
-svg_resolved_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/money-rupee-circle-line.svg"
+svg_resolved_path= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/money-rupee-circle-line.svg"
 response = requests.get(svg_resolved_path)
 svg_resolved = response.text
   
 # Getting a icon using CSS style: - Highest : Fulfilment Stuff.
-svg_total_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/shop-solid.svg"
+svg_total_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/shop-solid.svg"
 reponse = requests.get(svg_total_path)
 svg_total = reponse.text
 
 # Getting a icon using CSS style: - Highest 
-svg_icon_path_1= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/file-excel-solid.svg"
+svg_icon_path_1= "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/file-excel-solid.svg"
 response = requests.get(svg_icon_path_1)
 svg_hold = response.text
 
 
-svg_cancelled_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon%20Sales%20Analysis/Images/ban-solid (1).svg"
+svg_cancelled_path = "https://raw.githubusercontent.com/GomolemoKototsiAnalyst/Data-Analysis-Personal-Projects/main/Amazon_Sales_Analysis/Images/ban-solid (1).svg"
 response = requests.get(svg_cancelled_path)
 svg_cancelled = response.text
 
