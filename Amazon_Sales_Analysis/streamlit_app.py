@@ -1,10 +1,16 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[4]:
+
+
+import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
 import string
 import os
 from io import StringIO
-import streamlit as st
 from streamlit_option_menu import option_menu
 import warnings 
 from datetime import datetime, timedelta
@@ -740,3 +746,10 @@ with col[2]:
             - **Summary**: Most Commercial Sales were made from Amazon retail stores and not external merchants. Accounting for 69 percent overall sales for the period (in dollars). 
             - Overall most sold product in the period were T-Shirts and their most profitable state is 
             ''')
+
+
+# In[ ]:
+
+
+
+
