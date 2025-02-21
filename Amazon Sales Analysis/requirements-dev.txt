@@ -1,7 +1,0 @@
-numpy==2.2.3
-pandas==2.2.3
-plotly==6.0.0
-requests==2.32.3
-scipy==1.15.2
-streamlit==1.42.1
-streamlit_option_menu==0.4.0
