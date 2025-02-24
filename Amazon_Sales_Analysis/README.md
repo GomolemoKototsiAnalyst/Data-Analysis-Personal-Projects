@@ -33,6 +33,11 @@ CSS Styling & HTML [![CSS Styling](https://www.vectorlogo.zone/logos/w3_html5/w3
 ### Streamlit Dashboard: 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://data-analysis-personal-projects-9tr3u9cgugxtqptqghzvpw.streamlit.app/)
 
+
+##### Scheme of the Dashboard: 
+![Alt text](Images/example.png)
+
+
 ## Summary Based on Analysis: 
 
 The Amazon subsidiary in India generated a significant portion of its sales through its Amazon Retail division, which accounted for approximately 69% of the total sales, with the remainder coming from external merchants. Maharashtra emerged as the most profitable state, indicating that any future expansion or additional warehousing efforts should prioritize this region based on the provided insights. Additionally, T-shirts proved to be the most lucrative product category, contributing nearly 50% of the overall sales during the analyzed period in 2022. Further opportunities for growth could be achieved by minimizing deferred sales or losses caused by damaged goods, lost items, extended transit times, and products returned to sellers by customers.
