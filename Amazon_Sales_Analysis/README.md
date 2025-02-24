@@ -31,7 +31,7 @@ CSS Styling & HTML [![CSS Styling](https://www.vectorlogo.zone/logos/w3_html5/w3
 # Dynamic Dashboard Reporting: 
 
 ### Streamlit Dashboard: 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://population-dashboard.streamlit.app/](https://data-analysis-personal-projects-9tr3u9cgugxtqptqghzvpw.streamlit.app/))
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://data-analysis-personal-projects-9tr3u9cgugxtqptqghzvpw.streamlit.app/])
 
 ## Summary Based on Analysis: 
 
