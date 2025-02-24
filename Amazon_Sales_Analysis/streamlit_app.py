@@ -11,7 +11,6 @@ import requests
 import string
 import os
 from io import StringIO
-from streamlit_option_menu import option_menu
 import warnings 
 from datetime import datetime, timedelta
 import plotly.express as px
