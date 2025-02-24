@@ -35,8 +35,7 @@ CSS Styling & HTML [![CSS Styling](https://www.vectorlogo.zone/logos/w3_html5/w3
 
 
 ##### Scheme of the Dashboard: 
-![Alt text](Images/example.png)
-
+![Alt text](Images/Screenshot 2025-02-24 100207.png)
 
 ## Summary Based on Analysis: 
 
